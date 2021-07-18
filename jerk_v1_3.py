@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-#################### JERK SEARCH PIPELINE -- REQUIRES CALL_ACCEL.PY TO CREATE DM LIST FILE IN LOG TO PERFORM ACCELSEARCH ##########################
+#################### JERK SEARCH PIPELINE -- REQUIRES CALL_ACCEL.PY[with correct name of main pipeline] TO CREATE DM LIST FILE IN LOG TO PERFORM ACCELSEARCH ##########################
 ################### THIS CODE RUNS ACCELERATION SEARCH OF INDIVIDUAL TIME SERIES ON DIFFERENT NODES IN THE CLUSTER ############################
 #################### VERSION 1.3 ############################################
 
@@ -813,7 +813,7 @@ def split_into_chunks(list_datfiles_to_split, LOG_basename,  work_dir, segment_m
                         print "NOTE: %s already exists. Skipping" % (new_outfile_name)
 
 
-def periodicity_search_FFT(work_dir, log_dir, LOG_basename, zapfile, flag_use_cuda=0, list_cuda_ids=[0], numharm=8, list_zmax=[20], list_wmax=[50], period_to_search_min_s=0.001, period_to_search_max_s=20.0, other_flags_accelsearch="", flag_remove_fftfile=0, presto_env_zmax_0=os.environ['PRESTO'], presto_env_zmax_any=os.environ['PRESTO'], flag_verbose=0, flag_LOG_append=1, dict_flag_steps= {'flag_step_dedisperse':1 , 'flag_step_realfft': 1, 'flag_step_accelsearch': 1}, list_files_to_search=""):       
+def periodicity_search_FFT(sema,work_dir, log_dir, LOG_basename, zapfile, flag_use_cuda=0, list_cuda_ids=[0], numharm=8, list_zmax=[20], list_wmax=[50], period_to_search_min_s=0.001, period_to_search_max_s=20.0, other_flags_accelsearch="", flag_remove_fftfile=0, presto_env_zmax_0=os.environ['PRESTO'], presto_env_zmax_any=os.environ['PRESTO'], flag_verbose=0, flag_LOG_append=1, dict_flag_steps= {'flag_step_dedisperse':1 , 'flag_step_realfft': 1, 'flag_step_accelsearch': 1}, list_files_to_search=""):       
 
 #        if flag_verbose==1:
 #                print "periodicity_search_FFT:: Files to search: ", "%s/*DM*.*.dat, excluding red" % (work_dir)
@@ -824,7 +824,7 @@ def periodicity_search_FFT(work_dir, log_dir, LOG_basename, zapfile, flag_use_cu
 #        list_files_to_search = sorted([ x for x in glob.glob("%s/*DM*.*.dat" % (work_dir)) if not "red" in x ])
         
         print "INSIDE THE PERIODICITY SEARCH FUNCTION FROM FUNCTION CALL_ACCEL"
-	print "period min inside periodicity function: ", 1./float(period_to_search_min_s)
+	print "period min inside periodicity function: ", float(period_to_search_min_s)
 	print "log inside:", log_dir
 	frequency_to_search_max = 1./period_to_search_min_s
         frequency_to_search_min = 1./period_to_search_max_s
@@ -877,7 +877,7 @@ def periodicity_search_FFT(work_dir, log_dir, LOG_basename, zapfile, flag_use_cu
 		for z in list_zmax:
 			print "z ", z
 			#print "Doing accelsearch of %s with zmax = %4d and wmax =%4d..." % (zapped_fft_nameonly, z, w), ; sys.stdout.flush()
-			if int(z) == 0:
+			if (int(z) == 0 or int(z) < 200.0):
 				w = 0
 				print "Doing accelsearch of %s with zmax = %4d..." % (zapped_fft_nameonly, z), ; sys.stdout.flush()
 				dict_env = copy.deepcopy(dict_env_zmax_0)
@@ -940,10 +940,12 @@ def periodicity_search_FFT(work_dir, log_dir, LOG_basename, zapfile, flag_use_cu
 
 						accelsearch_flags = other_flags_accelsearch + flag_cuda #+ " -flo %s -fhi %s" % (frequency_to_search_min, frequency_to_search_max) 
 							
-						accelsearch(fft_file, work_dir, log_abspath, numharm=numharm, zmax=z, wmax=w, other_flags=accelsearch_flags, dict_env=dict_env, flag_verbose=flag_verbose, flag_LOG_append=flag_LOG_append)
+						accelsearch(fft_file, work_dir, log_abspath, numharm=4, zmax=z, wmax=w, other_flags=accelsearch_flags, dict_env=dict_env, flag_verbose=flag_verbose, flag_LOG_append=flag_LOG_append)
 						ACCEL_filename = fft_file.replace(".fft", "_ACCEL_%s_JERK_%s" % (int(z),int(w)))
 						print "done!" ; sys.stdout.flush()
 					   
+
+	sema.release()
 
 #if flag_remove_fftfile==1:
 #        print "Removing %s..." % (fft_file_nameonly), ; sys.stdout.flush()
@@ -1670,7 +1672,9 @@ class SurveyConfiguration(object):
                 self.list_0DM_datfiles          = []
                 self.list_0DM_fftfiles          = []
                 self.list_0DM_fftfiles_rednoise = []
-                self.list_segments_nofull       = copy.deepcopy(self.list_segments); self.list_segments_nofull.remove("full")
+                self.list_segments_nofull       = copy.deepcopy(self.list_segments)
+ 		if "full" in self.list_segments_nofull: 
+			self.list_segments_nofull.remove("full")
                 self.dict_chunks                = {}      # {'filename': {'20m':   [0,1,2]}}
                 self.dict_search_structure      = {}
                 if self.presto_gpu_env == "":
