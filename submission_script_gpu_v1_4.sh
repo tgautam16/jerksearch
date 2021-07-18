@@ -89,7 +89,7 @@ else
 		tmp=$(($tmp+1))
 		#echo ${dmlist_files}
 		
-		sbatch --gres=gpu:3 --nodes=1 -J acl_${filename} --error=${tjoberr}.${tmp}.%j --output=${tjobout}.${tmp}.%j --mail-user=tgautam@mpifr-bonn.mpg.de --partition=${partition_step2} --cpus-per-task=48 --mem=62000 --wrap="singularity exec --nv -H /hercules/scratch/tasha/:/home1 -B /mkfs/00/GC/:/mkfs/00/GC/ -B /hercules/scratch/tasha/:/hercules/scratch/tasha /scratch/vkrishna/singularity_images/presto_gpu_sm75-2021-04-11-1a925bfbf734.sif python /home1/scripts/call_accel_gpu.py -config ${config} -obs ${file} -infile ${dmlist_files}"		
+		sbatch --gres=gpu:3 --nodes=1 -J acl_${filename} --error=${tjoberr}.${tmp}.%j --output=${tjobout}.${tmp}.%j --mail-user=tgautam@mpifr-bonn.mpg.de --partition=${partition_step2} --cpus-per-task=48 --mem=62000 --wrap="singularity exec --nv -H /hercules/scratch/tasha/:/home1 -B /mkfs/00/GC/:/mkfs/00/GC/ -B /hercules/scratch/tasha/:/hercules/scratch/tasha /scratch/vkrishna/singularity_images/presto_gpu_sm75-2021-04-11-1a925bfbf734.sif python /home1/scripts/call_accel_gpu_v1_4.py -config ${config} -obs ${file} -infile ${dmlist_files}"		
 		export JOBS=`squeue -u tasha| wc -l` ## MIGREV
 		export QUEUE=`squeue -u tasha| grep 'PD' | wc -l`
 		while (( ${JOBS} > 100 || ${QUEUE} > 100 ))
