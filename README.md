@@ -1,7 +1,7 @@
 # JERK SEARCH PIPELINE
 
 A faster parallelised jerksearch pipeline usable in MPIFR's hercules cluster based on A. Ridolfi's PULSAR_MINER code
-JERK SEARCH PIPELINE V1.3 (this version does not includ MPI_PREPSUBBAND and includes only cpu based accelsearch + cpu based jerksearch), for a version with MPI_PREPSUBBAND contact me at tgautam@mpifr-bonn.mpg.de:
+JERK SEARCH PIPELINE V1.3 (this version does not includ MPI_PREPSUBBAND and includes only cpu based accelsearch + cpu based jerksearch), for a version with MPI_PREPSUBBAND use v1.4:
 Requirements: Singularity image including PRESTO,TEMPO,PSRCHIVE
 
 You run the pipeline by doing ‘source submission.sh’
@@ -36,3 +36,6 @@ You can find all the results in 05_FOLDING folder
 
 -Two files named DMlistfile.txt and parametersfile.txt (no longer needed though) will also be produced in the LOG directory by the first run of the pipeline(i.e. In first step)
 
+
+
+Contact me at tgautam@mpifr-bonn.mpg.de for doubts/suggestions.
