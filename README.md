@@ -1,8 +1,8 @@
-# JERK SEARCH PIPELINE
+# PULSAR SEARCH PIPELINE
 
-A faster parallelised jerksearch pipeline usable in MPIFR's hercules cluster based on A. Ridolfi's PULSAR_MINER code.
+A faster parallelised and dockerised jerksearch pipeline usable in MPIFR's hercules cluster (based on A. Ridolfi's PULSAR_MINER).
 
-JERK SEARCH PIPELINE V1.3 does not include MPI_PREPSUBBAND and includes only cpu based accelsearch + cpu based jerksearch, for a version with MPI_PREPSUBBAND use v1.4:
+PULSAR SEARCH PIPELINE V1.3 using Jerk search does not include MPI_PREPSUBBAND and includes only cpu based accelsearch + cpu based jerksearch, for a version with MPI_PREPSUBBAND use v1.4:
 Requirements: Singularity image including PRESTO,TEMPO,PSRCHIVE
 
 You run the pipeline by doing ‘source submission.sh’
